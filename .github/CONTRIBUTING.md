@@ -122,7 +122,8 @@ Some additional advice:
   GIFs on macOS and Windows
 * **List some other applications where this enhancement exists, if applicable**
 
-### Help Wanted
+### Help me ples
+
 
 As part of building GitHub Desktop, we'll identify tasks that are good for
 external contributors to pick up. These tasks:
