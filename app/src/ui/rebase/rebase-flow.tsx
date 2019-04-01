@@ -254,6 +254,8 @@ export class RebaseFlow extends React.Component<
   }
 
   private updateProgress = (progress: IRebaseProgress) => {
+    const { rebasedCommitCount, value, commitSummary } = progress
+
     // this ensures the progress bar fills to 100%, while `componentDidUpdate`
     // detects and handles the state transition after a period of time to ensure
     // the UI shows _something_ before closing the dialog
@@ -261,7 +263,9 @@ export class RebaseFlow extends React.Component<
       const { commits } = prevState.progress
       return {
         progress: {
-          ...progress,
+          rebasedCommitCount,
+          value,
+          currentCommitSummary: commitSummary,
           commits,
         },
       }
@@ -273,12 +277,21 @@ export class RebaseFlow extends React.Component<
     // detects and handles the state transition after a period of time to ensure
     // the UI shows _something_ before closing the dialog
     this.setState(prevState => {
+      let currentCommitSummary: string | undefined = undefined
+
+      const { rebaseStatus } = prevState
+
+      if (rebaseStatus !== null && rebaseStatus.kind === ComputedAction.Clean) {
+        const { commits } = rebaseStatus
+        currentCommitSummary = commits[commits.length - 1].summary
+      }
+
       const { commits } = prevState.progress
-      const rebasedCommitCount = commits.length
       return {
         progress: {
           value: 1,
-          rebasedCommitCount,
+          currentCommitSummary,
+          rebasedCommitCount: commits.length,
           commits,
         },
       }
@@ -371,6 +384,9 @@ export class RebaseFlow extends React.Component<
       const newProgressValue = newCount / commits.length
       const value = formatRebaseValue(newProgressValue)
 
+      const currentCommitSummary =
+        newCount <= commits.length ? commits[newCount - 1].summary : undefined
+
       return {
         step: {
           kind: RebaseStep.ShowProgress,
@@ -380,6 +396,7 @@ export class RebaseFlow extends React.Component<
           value,
           rebasedCommitCount: newCount,
           commits,
+          currentCommitSummary,
         },
       }
     })
