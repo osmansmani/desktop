@@ -106,6 +106,18 @@ export class RebaseFlow extends React.Component<
       },
       userHasResolvedConflicts: false,
     }
+
+    const { step } = this.state
+
+    if (
+      step.kind === RebaseStep.ShowConflicts &&
+      step.previousProgress !== null
+    ) {
+      this.state = {
+        ...this.state,
+        progress: step.previousProgress,
+      }
+    }
   }
 
   public async componentDidUpdate() {
@@ -126,6 +138,7 @@ export class RebaseFlow extends React.Component<
             targetBranch,
             workingDirectory,
             manualResolutions,
+            previousProgress: null,
           },
         })
       } else if (this.state.progress.value >= 1) {
@@ -185,6 +198,7 @@ export class RebaseFlow extends React.Component<
         targetBranch,
         workingDirectory,
         manualResolutions,
+        previousProgress: null,
       },
     })
   }
